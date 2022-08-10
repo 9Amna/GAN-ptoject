@@ -76,8 +76,6 @@ def show_img_sample(img: torch.Tensor, img1: torch.Tensor):
     plt.show()
 
 
-
-
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
@@ -258,9 +256,6 @@ def train_loop(train_dl, G, D, num_epoch, lr=0.0002, betas=(0.5, 0.999)):
         return G, D
 
 
-
-
-
 def load_model(name):
     G = Generator()
     G.load_state_dict(torch.load(f"weight/G{name}.pth", map_location={"cuda:0": "cpu"}))
@@ -322,19 +317,16 @@ def evaluate(val_dl, name, G):
     evaluate(val_dl, 5, trained_G)
 
 
-
-
 def load_args(default_config=None):
     parser = argparse.ArgumentParser(description='GAN model implementation')
     # -- access to dataset
     parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
     # -- parametres
-    parser.add_argument('--MEAN', default= (0.5, 0.5, 0.5,), help='mean')
+    parser.add_argument('--MEAN', default=(0.5, 0.5, 0.5,), help='mean')
     parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
-    parser.add_argument('--RESIZE', type= int,  default=256, help='resize')
-    parser.add_argument('--LAMBDA',type=int, default=100.0,help='lambda value')
+    parser.add_argument('--RESIZE', type=int, default=256, help='resize')
+    parser.add_argument('--LAMBDA', type=int, default=100.0, help='lambda value')
     # -- train
-    parser.add_argument('--training-mode', default='tcn', help='tcn')
     parser.add_argument('--BATCH_SIZE', type=int, default=16, help='Mini-batch size')
     parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
     parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
@@ -346,16 +338,15 @@ def load_args(default_config=None):
     parser.add_argument('--pool_size', default=None, help='size of pool')
     parser.add_argument('--stride', type=int, default=1)
 
-
-
     args = parser.parse_args()
     return args
+
 
 if __name__ == "__main__":
     args = load_args()
     print(args)
     # root_path = "/content/drive/MyDrive/Dataset_dents"
-    train = read_path(data_path= 'root_path', split="train")
+    train = read_path(data_path='root_path', split="train")
     val = read_path(data_path='root_path', split="val")
     train_ds = Dataset(train)
     val_ds = Dataset(val)
