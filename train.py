@@ -19,9 +19,8 @@ STD = (0.5, 0.5, 0.5,)
 RESIZE = 256
 
 
-def read_path(filepath) -> List[str]:
-    root_path = "/content/drive/MyDrive/Dataset_dents"
-    path = os.path.join(root_path, filepath)
+def read_path(data_path, split) -> List[str]:
+    path = os.path.join(data_path, split)
     dataset = []
     for p in glob(path + "/" + "*.jpg"):
         dataset.append(p)
@@ -355,14 +354,14 @@ def load_args(default_config=None):
 if __name__ == "__main__":
     args = load_args()
     print(args)
-
-    # train = read_path("train")
-    # val = read_path("val")
+    # root_path = "/content/drive/MyDrive/Dataset_dents"
+    train = read_path(data_path=root_path, split="train")
+    val = read_path(data_path=root_path, split="val")
     # train_ds = Dataset(train)
     # val_ds = Dataset(val)
     #
     # show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
-    # 
+    #
     # BATCH_SIZE = 16
     # device = "cuda:0" if torch.cuda.is_available() else "cpu"
     # torch.manual_seed(0)
