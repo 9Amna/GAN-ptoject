@@ -366,21 +366,21 @@ if __name__ == "__main__":
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
     #resume =True
-    # start_epoch = 0
-    # if args.resume is not None:
-    #     print('Resume training from %s' % args.resume)
-    #     checkpoint = torch.load(args.resume)
-    #     start_epoch = checkpoint["e"] - 1
-    #     # load pretrained models D & G
-    #     G = Generator()
-    #     G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{start_epoch}.pth"))
-    #     # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
-    #     D = Discriminator()
-    #     G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{start_epoch}.pth"))
-    #     # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
-    # else:
-    #     G = Generator()
-    #     D = Discriminator()
+    start_epoch = 0
+    if args.resume is not None:
+        print('Resume training from %s' % args.resume)
+        checkpoint = torch.load(args.resume)
+        start_epoch = checkpoint["e"] - 1
+        # load pretrained models D & G
+        G = Generator()
+        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{start_epoch}.pth"))
+        # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+        D = Discriminator()
+        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{start_epoch}.pth"))
+        # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+    else:
+        G = Generator()
+        D = Discriminator()
 
     # EPOCH = 25
     # trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
