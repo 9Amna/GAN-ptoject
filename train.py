@@ -389,4 +389,4 @@ if __name__ == "__main__":
         D = Discriminator()
 
     EPOCH = 25
-    trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, args.device)
+    trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, device)
