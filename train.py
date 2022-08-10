@@ -77,7 +77,7 @@ def show_img_sample(img: torch.Tensor, img1: torch.Tensor):
 
 
 class Generator(nn.Module):
-    def __init__(self):
+    def __init__(self) -> object:
         super(Generator, self).__init__()
         self.enc1 = self.conv2Relu(3, 32, 5)  # encoder
         self.enc2 = self.conv2Relu(32, 64, pool_size=4)
@@ -368,11 +368,11 @@ if __name__ == "__main__":
         if args.EPOCH is not None:
             # load pretrained models D & G
             G = Generator()
-            G.load_state_dict(torch.load(f"/content/drive/MyDrive/G{epoch}.pth"))
-            #G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+            G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{epoch}.pth"))
+            # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
             D = Discriminator()
-            G.load_state_dict(torch.load(f"/content/drive/MyDrive/G{epoch}.pth"))
-            #D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+            G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{epoch}.pth"))
+            # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
         else:
             G = Generator()
             D = Discriminator()
