@@ -357,8 +357,8 @@ if __name__ == "__main__":
     # root_path = "/content/drive/MyDrive/Dataset_dents"
     train = read_path(data_path= 'root_path', split="train")
     val = read_path(data_path='root_path', split="val")
-    # train_ds = Dataset(train)
-    # val_ds = Dataset(val)
+    train_ds = Dataset(train)
+    val_ds = Dataset(val)
     #
     # show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
     #
