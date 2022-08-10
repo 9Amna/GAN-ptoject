@@ -347,7 +347,7 @@ def load_args(default_config=None):
     parser.add_argument('--kernel_size', default=3, help='size of kernel')
     parser.add_argument('--pool_size', default=None, help='size of pool')
     parser.add_argument('--stride', type=int, default=1)
-    parser.add_argument('--resume', default='/content/drive/MyDrive/saving',
+    parser.add_argument('--resume', default='/content/drive/MyDrive/saving_D30.pth',
                         help='checkpoint to resume training from (default: None)')
 
     args = parser.parse_args()
@@ -374,19 +374,16 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    #resume =True
-    start_epoch = 0
+
     if args.resume is not None:
         print('Resume training from %s' % args.resume)
-        checkpoint = torch.load(args.resume)
-        start_epoch = checkpoint["e"] - 1
         # load pretrained models D & G
         G = Generator()
-        G.load_state_dict(torch.load(f"{args.resume}_G{start_epoch}.pth"))
-        # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+        G_path= args.resume.replace('_D','_G')
+        print(G_path)
+        G.load_state_dict(torch.load(G_path))
         D = Discriminator()
-        G.load_state_dict(torch.load(f"{args.resume}_D{start_epoch}.pth"))
-        # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+        G.load_state_dict(torch.load(args.resume))
     else:
         G = Generator()
         D = Discriminator()
