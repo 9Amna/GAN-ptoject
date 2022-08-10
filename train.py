@@ -360,7 +360,7 @@ if __name__ == "__main__":
     train_ds = Dataset(train)
     val_ds = Dataset(val)
     #
-    # show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
+    show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
     #
     # BATCH_SIZE = 16
     # device = "cuda:0" if torch.cuda.is_available() else "cpu"
