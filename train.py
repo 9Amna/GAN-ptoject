@@ -235,7 +235,7 @@ def train_loop(train_dl, G, D, num_epoch, lr=0.0002, betas=(0.5, 0.999)):
     total_loss_d, total_loss_g = [], []
     result = {}
 
-    for e in range(num_epoch):
+    for e in range(start_epoch, args.EPOCH):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
         # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
         loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d)
@@ -321,7 +321,7 @@ def load_args(default_config=None):
     parser = argparse.ArgumentParser(description='GAN model implementation')
     # -- access to dataset
     parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
-    # -- parametres
+    # -- parameters
     parser.add_argument('--MEAN', default=(0.5, 0.5, 0.5,), help='mean')
     parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
     parser.add_argument('--RESIZE', type=int, default=256, help='resize')
@@ -365,9 +365,11 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    # resume =True
+    start_epoch = 0
     if args.resume is not None:
         print('Resume training from %s' % args.resume)
+        checkpoint = torch.load(args.resume)
+        start_epoch = checkpoint['e'] - 1
         # load pretrained models D & G
         G = Generator()
         G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{args.resume}.pth"))
