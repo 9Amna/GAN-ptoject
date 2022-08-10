@@ -327,12 +327,12 @@ def load_args(default_config=None):
     parser.add_argument('--RESIZE', type=int, default=256, help='resize')
     parser.add_argument('--LAMBDA', type=int, default=100.0, help='lambda value')
     # -- train
-    parser.add_argument('--BATCH_SIZE', type=int, default=16, help='Mini-batch size')
+    parser.add_argument('--BATCH_SIZE', type=int, default=8, help='Mini-batch size')
     parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
     parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
     parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
     parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
-    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
+    parser.add_argument('--device', type=str, default='cuda', choices=['cuda', 'cpu'])
     # -- conv / deconv layers
     parser.add_argument('--kernel_size', default=3, help='size of kernel')
     parser.add_argument('--pool_size', default=None, help='size of pool')
@@ -352,16 +352,16 @@ if __name__ == "__main__":
     train_ds = Dataset(train)
     val_ds = Dataset(val)
     #
-    show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
+    # show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
     #
-    # BATCH_SIZE = 16
-    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    # torch.manual_seed(0)
-    # np.random.seed(0)
-    #
-    # train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-    # val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
-    #
+    BATCH_SIZE = args.BATCH_SIZE
+    device = args.device
+    torch.manual_seed(0)
+    np.random.seed(0)
+
+    train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
+    val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
+
     # resume = True
     # if resume:
     #     # load pretrained models D & G
