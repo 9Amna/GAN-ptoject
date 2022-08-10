@@ -7,7 +7,7 @@ import cv2
 from typing import List, Tuple, Dict
 from statistics import mean
 from tqdm import tqdm
-
+import argparse
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -273,8 +273,16 @@ def train_loop(train_dl, G, D, num_epoch, lr=0.0002, betas=(0.5, 0.999)):
         return G, D
 
 
-G = Generator()
-D = Discriminator()
+resume = True
+if resume:
+  # load pretrained models D & G
+  G = Generator()
+  G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+  D = Discriminator()
+  D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+else:
+  G = Generator()
+  D = Discriminator()
 EPOCH = 25
 trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
 
@@ -338,3 +346,37 @@ def evaluate(val_dl, name, G):
     train_show_img(5, trained_G)
 
     evaluate(val_dl, 5, trained_G)
+
+
+
+
+def load_args(default_config=None):
+    parser = argparse.ArgumentParser(description='GAN model implementation')
+    # -- access to dataset
+    parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
+    # -- parametres
+    parser.add_argument('--MEAN', default= (0.5, 0.5, 0.5,), help='mean')
+    parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
+    parser.add_argument('--RESIZE', type= int,  default=256, help='resize')
+    parser.add_argument('--LAMBDA',type=int, default=100.0,help='lambda value')
+    # -- train
+    parser.add_argument('--training-mode', default='tcn', help='tcn')
+    parser.add_argument('--BATCH_SIZE', type=int, default=16, help='Mini-batch size')
+    parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
+    parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
+    parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
+    parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
+    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
+    # -- conv / deconv layers
+    parser.add_argument('--kernel_size', default=3, help='size of kernel')
+    parser.add_argument('--pool_size', default=None, help='size of pool')
+    parser.add_argument('--stride', type=int, default=1)
+
+
+
+    args = parser.parse_args()
+    return args
+
+if __name__ == "__main__":
+    args = load_args()
+    print(args)
