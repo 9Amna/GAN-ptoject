@@ -77,20 +77,6 @@ def show_img_sample(img: torch.Tensor, img1: torch.Tensor):
     plt.show()
 
 
-train = read_path("train")
-val = read_path("val")
-train_ds = Dataset(train)
-val_ds = Dataset(val)
-
-show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
-
-BATCH_SIZE = 16
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
-torch.manual_seed(0)
-np.random.seed(0)
-
-train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
 
 class Generator(nn.Module):
@@ -273,18 +259,7 @@ def train_loop(train_dl, G, D, num_epoch, lr=0.0002, betas=(0.5, 0.999)):
         return G, D
 
 
-resume = True
-if resume:
-  # load pretrained models D & G
-  G = Generator()
-  G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
-  D = Discriminator()
-  D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
-else:
-  G = Generator()
-  D = Discriminator()
-EPOCH = 25
-trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
+
 
 
 def load_model(name):
@@ -380,3 +355,31 @@ def load_args(default_config=None):
 if __name__ == "__main__":
     args = load_args()
     print(args)
+
+    # train = read_path("train")
+    # val = read_path("val")
+    # train_ds = Dataset(train)
+    # val_ds = Dataset(val)
+    #
+    # show_img_sample(train_ds.__getitem__(1)[0], train_ds.__getitem__(1)[1])
+    # 
+    # BATCH_SIZE = 16
+    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # torch.manual_seed(0)
+    # np.random.seed(0)
+    #
+    # train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
+    # val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
+    #
+    # resume = True
+    # if resume:
+    #     # load pretrained models D & G
+    #     G = Generator()
+    #     G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+    #     D = Discriminator()
+    #     D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+    # else:
+    #     G = Generator()
+    #     D = Discriminator()
+    # EPOCH = 25
+    # trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
