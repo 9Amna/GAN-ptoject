@@ -363,15 +363,17 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    resume = True
-    if resume:
-         # load pretrained models D & G
-         G = Generator()
-         G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
-         D = Discriminator()
-         D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
-    else:
-         G = Generator()
-         D = Discriminator()
+    # resume =True
+    for epoch in range(args.EPOCH):
+        if args.EPOCH is None:
+            G = Generator()
+            D = Discriminator()
+        else :
+            # load pretrained models D & G
+            G = Generator()
+            G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+            D = Discriminator()
+            D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+
     # EPOCH = 25
     # trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
