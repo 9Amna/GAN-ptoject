@@ -209,7 +209,7 @@ def saving_logs(result):
 
 
 def saving_model(D, G, e):
-    os.makedirs(f"/content/drive/MyDrive/savings", exist_ok=True)
+    os.makedirs(f"/content/drive/MyDrive/saving", exist_ok=True)
     torch.save(G.state_dict(), f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
     torch.save(D.state_dict(), f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
 
