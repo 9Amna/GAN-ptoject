@@ -345,9 +345,10 @@ def load_args(default_config=None):
 if __name__ == "__main__":
     args = load_args()
     print(args)
+    root_path = args.root_path
     # root_path = "/content/drive/MyDrive/Dataset_dents"
-    train = read_path(data_path='root_path', split="train")
-    val = read_path(data_path='root_path', split="val")
+    train = read_path(data_path=root_path, split="train")
+    val = read_path(data_path=root_path, split="val")
     train_ds = Dataset(train)
     val_ds = Dataset(val)
     #
