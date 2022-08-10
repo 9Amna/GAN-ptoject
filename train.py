@@ -305,8 +305,8 @@ def evaluate(val_dl, name, G):
             batch_size_2 = batch_size * 2
 
             for i in range(batch_size):
-                ax[i].imshow(input_img[i].permute(1, 2, 0))
-                ax[i + batch_size].imshow(de_norm(real_img[i]))
+                ax[i].imshow(real_img[i].permute(1, 2, 0))
+                ax[i + batch_size].imshow(de_norm(input_img[i]))
                 ax[i + batch_size_2].imshow(de_norm(fake_img[i]))
                 ax[i].set_xticks([])
                 ax[i].set_yticks([])
@@ -315,15 +315,13 @@ def evaluate(val_dl, name, G):
                 ax[i + batch_size_2].set_xticks([])
                 ax[i + batch_size_2].set_yticks([])
                 if i == 0:
-                    ax[i].set_ylabel("Input Image", c="g")
-                    ax[i + batch_size].set_ylabel("Real Image", c="g")
+                    ax[i].set_ylabel("Real Image", c="g")
+                    ax[i + batch_size].set_ylabel("Input Image", c="g")
                     ax[i + batch_size_2].set_ylabel("Generated Image", c="r")
             plt.subplots_adjust(wspace=0, hspace=0)
             break
 
-    train_show_img(5, trained_G)
 
-    evaluate(val_dl, 5, trained_G)
 
 
 def load_args(default_config=None):
@@ -390,3 +388,6 @@ if __name__ == "__main__":
 
     EPOCH = 25
     trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, device)
+
+    train_show_img(5, trained_G)
+    evaluate(val_dl, 5, trained_G)
