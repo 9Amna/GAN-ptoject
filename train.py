@@ -365,15 +365,15 @@ if __name__ == "__main__":
 
     # resume =True
     for epoch in range(args.EPOCH):
-        if args.EPOCH is None:
-            G = Generator()
-            D = Discriminator()
-        else :
+        if args.EPOCH is not None:
             # load pretrained models D & G
             G = Generator()
             G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
             D = Discriminator()
             D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+        else :
+            G = Generator()
+            D = Discriminator()
 
     # EPOCH = 25
     # trained_G, trained_D = train_loop(train_dl, G, D, EPOCH)
