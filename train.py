@@ -209,7 +209,7 @@ def saving_logs(result):
 
 
 def saving_model(D, G, e):
-    os.chdir(f"/content/drive/MyDrive/saving")
+    os.makedirs("weight", exist_ok=True)
     torch.save(G.state_dict(), f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
     torch.save(D.state_dict(), f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
 
@@ -242,8 +242,17 @@ def train_loop(train_dl, G, D, lr=0.0002, betas=(0.5, 0.999)):
         total_loss_d.append(loss_d)
         total_loss_g.append(loss_g)
         saving_img(fake_img, e + 1)
-
-        if e % 10 == 0:
+        torch.save({
+            'epoch': e,
+            'model_state_dict': G.state_dict(),
+            'optimizer_state_dict': optimizer_g.state_dict(),
+            'loss': loss_g, }, f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
+        torch.save({
+            'epoch': e,
+            'model_state_dict': D.state_dict(),
+            'optimizer_state_dict': optimizer_d.state_dict(),
+            'loss': loss_d, }, f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
+    if e % 1 == 0:
             saving_model(D, G, e)
     try:
         result["G"] = total_loss_d
