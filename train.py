@@ -305,8 +305,8 @@ def evaluate(val_dl, name, G):
             batch_size_2 = batch_size * 2
 
             for i in range(batch_size):
-                ax[i].imshow(real_img[i].permute(1, 2, 0))
-                ax[i + batch_size].imshow(de_norm(input_img[i]))
+                ax[i].imshow(input_img[i].permute(1, 2, 0))
+                ax[i + batch_size].imshow(de_norm(real_img[i]))
                 ax[i + batch_size_2].imshow(de_norm(fake_img[i]))
                 ax[i].set_xticks([])
                 ax[i].set_yticks([])
