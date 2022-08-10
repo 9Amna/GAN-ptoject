@@ -224,7 +224,7 @@ def show_losses(g, d):
     plt.show()
 
 
-def train_loop(train_dl, G, D, num_epoch, lr=0.0002, betas=(0.5, 0.999)):
+def train_loop(train_dl, G, D, lr=0.0002, betas=(0.5, 0.999)):
     G.to(device)
     D.to(device)
     optimizer_g = torch.optim.Adam(G.parameters(), lr=lr, betas=betas)
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     if args.resume is not None:
         print('Resume training from %s' % args.resume)
         checkpoint = torch.load(args.resume)
-        start_epoch = checkpoint['e'] - 1
+        start_epoch = checkpoint["e"] - 1
         # load pretrained models D & G
         G = Generator()
         G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{args.resume}.pth"))
