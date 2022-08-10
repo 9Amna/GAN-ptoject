@@ -342,7 +342,7 @@ def load_args(default_config=None):
     parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
     parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
     parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
-    parser.add_argument('--device', type=str, default='cpu', choices=['cuda', 'cpu'])
+    parser.add_argument('--device', type=str, default='GPU', choices=['cuda', 'cpu','GPU'])
     # -- conv / deconv layers
     parser.add_argument('--kernel_size', default=3, help='size of kernel')
     parser.add_argument('--pool_size', default=None, help='size of pool')
@@ -389,4 +389,4 @@ if __name__ == "__main__":
         D = Discriminator()
 
     EPOCH = 25
-    trained_G, trained_D = train_loop(train_dl, G, D, EPOCH,args.device)
+    trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, args.device)
