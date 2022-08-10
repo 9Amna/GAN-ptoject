@@ -129,7 +129,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self) -> object:
         super(Discriminator, self).__init__()
         self.layer1 = self.conv2relu(6, 16, 5, cnt=1)
         self.layer2 = self.conv2relu(16, 32, pool_size=4)
@@ -368,10 +368,12 @@ if __name__ == "__main__":
         if args.EPOCH is not None:
             # load pretrained models D & G
             G = Generator()
-            G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
+            G.load_state_dict(torch.load(f"/content/drive/MyDrive/G{epoch}.pth"))
+            #G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
             D = Discriminator()
-            D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
-        else :
+            G.load_state_dict(torch.load(f"/content/drive/MyDrive/G{epoch}.pth"))
+            #D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
+        else:
             G = Generator()
             D = Discriminator()
 
