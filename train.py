@@ -159,7 +159,7 @@ class Discriminator(nn.Module):
         return self.layer6(out)  # (b, 1, 2, 2)
 
 
-def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d):
+def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device):
     G.train()
     D.train()
     LAMBDA = 100.0
@@ -224,7 +224,7 @@ def show_losses(g, d):
     plt.show()
 
 
-def train_loop(train_dl, G, D,num_epoch,device, lr=0.0002, betas=(0.5, 0.999)):
+def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     G.to(device)
     D.to(device)
     optimizer_g = torch.optim.Adam(G.parameters(), lr=lr, betas=betas)
