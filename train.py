@@ -4,7 +4,7 @@ import os, time, pickle, json
 from glob import glob
 from PIL import Image
 import cv2
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union, Any
 from statistics import mean
 from tqdm import tqdm
 import argparse
@@ -209,9 +209,9 @@ def saving_logs(result):
 
 
 def saving_model(D, G, e):
-    os.makedirs("weight", exist_ok=True)
-    torch.save(G.state_dict(), f"weight/G{str(e + 1)}.pth")
-    torch.save(D.state_dict(), f"weight/D{str(e + 1)}.pth")
+    os.makedirs("savings", exist_ok=True)
+    torch.save(G.state_dict(), f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
+    torch.save(D.state_dict(), f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
 
 
 def show_losses(g, d):
@@ -258,7 +258,7 @@ def train_loop(train_dl, G, D, lr=0.0002, betas=(0.5, 0.999)):
 
 def load_model(name):
     G = Generator()
-    G.load_state_dict(torch.load(f"weight/G{name}.pth", map_location={"cuda:0": "cpu"}))
+    G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{name}.pth", map_location={"cuda:0": "cpu"}))
     G.eval()
     return G.to(device)
 
