@@ -372,10 +372,10 @@ if __name__ == "__main__":
         start_epoch = checkpoint["e"] - 1
         # load pretrained models D & G
         G = Generator()
-        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{args.resume}.pth"))
+        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{start_epoch}.pth"))
         # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
         D = Discriminator()
-        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{args.resume}.pth"))
+        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{start_epoch}.pth"))
         # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
     else:
         G = Generator()
