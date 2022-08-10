@@ -338,7 +338,7 @@ def load_args(default_config=None):
     parser.add_argument('--kernel_size', default=3, help='size of kernel')
     parser.add_argument('--pool_size', default=None, help='size of pool')
     parser.add_argument('--stride', type=int, default=1)
-    parser.add_argument('--resume', type=str, default=None, metavar='CKPT',
+    parser.add_argument('--resume', type=str, default='/content/drive/MyDrive/saving', metavar='CKPT',
                         help='checkpoint to resume training from (default: None)')
 
     args = parser.parse_args()
