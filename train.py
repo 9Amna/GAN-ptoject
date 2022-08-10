@@ -338,7 +338,7 @@ def load_args(default_config=None):
     parser.add_argument('--kernel_size', default=3, help='size of kernel')
     parser.add_argument('--pool_size', default=None, help='size of pool')
     parser.add_argument('--stride', type=int, default=1)
-    parser.add_argument('--resume', default='/content/drive/MyDrive/saving_G',
+    parser.add_argument('--resume', default='/content/drive/MyDrive/saving',
                         help='checkpoint to resume training from (default: None)')
 
     args = parser.parse_args()
@@ -373,10 +373,10 @@ if __name__ == "__main__":
         start_epoch = checkpoint["e"] - 1
         # load pretrained models D & G
         G = Generator()
-        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{start_epoch}.pth"))
+        G.load_state_dict(torch.load(f"{args.resume}_G{start_epoch}.pth"))
         # G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G30.pth"))
         D = Discriminator()
-        G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D{start_epoch}.pth"))
+        G.load_state_dict(torch.load(f"{args.resume}_D{start_epoch}.pth"))
         # D.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_D30.pth"))
     else:
         G = Generator()
