@@ -331,6 +331,7 @@ def load_args(default_config=None):
     parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
     parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd', 'adamw'])
     parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
+    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
     parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
     parser.add_argument('--device', type=str, default='cuda', choices=['cuda', 'cpu'])
     # -- conv / deconv layers
