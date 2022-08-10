@@ -315,8 +315,8 @@ def evaluate(val_dl, name, G):
                 ax[i + batch_size_2].set_xticks([])
                 ax[i + batch_size_2].set_yticks([])
                 if i == 0:
-                    ax[i].set_ylabel("Real Image", c="g")
-                    ax[i + batch_size].set_ylabel("Input Image", c="g")
+                    ax[i].set_ylabel("Input Image", c="g")
+                    ax[i + batch_size].set_ylabel("Real Image", c="g")
                     ax[i + batch_size_2].set_ylabel("Generated Image", c="r")
             plt.subplots_adjust(wspace=0, hspace=0)
             break
