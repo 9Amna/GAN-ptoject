@@ -238,7 +238,7 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     for e in range(num_epoch):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
         # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
-        loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d)
+        loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
         total_loss_d.append(loss_d)
         total_loss_g.append(loss_g)
         saving_img(fake_img, e + 1)
