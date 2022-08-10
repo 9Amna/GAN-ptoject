@@ -383,7 +383,7 @@ if __name__ == "__main__":
         print(G_path)
         G.load_state_dict(torch.load(G_path))
         D = Discriminator()
-        G.load_state_dict(torch.load(args.resume))
+        D.load_state_dict(torch.load(args.resume))
     else:
         G = Generator()
         D = Discriminator()
