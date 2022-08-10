@@ -224,7 +224,7 @@ def show_losses(g, d):
     plt.show()
 
 
-def train_loop(train_dl, G, D, lr=0.0002, betas=(0.5, 0.999)):
+def train_loop(train_dl, G, D,num_epoch, lr=0.0002, betas=(0.5, 0.999)):
     G.to(device)
     D.to(device)
     optimizer_g = torch.optim.Adam(G.parameters(), lr=lr, betas=betas)
@@ -235,7 +235,7 @@ def train_loop(train_dl, G, D, lr=0.0002, betas=(0.5, 0.999)):
     total_loss_d, total_loss_g = [], []
     result = {}
 
-    for e in range(start_epoch, args.EPOCH):
+    for e in range(num_epoch):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
         # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
         loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d)
