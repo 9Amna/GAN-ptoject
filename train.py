@@ -365,6 +365,7 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
+    resume=True
     start_epoch = 0
     if args.resume is not None:
         print('Resume training from %s' % args.resume)
