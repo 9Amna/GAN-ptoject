@@ -291,7 +291,7 @@ def de_norm(img):
     return img_
 
 
-def evaluate(val_dl, name, G):
+def evaluate(val_dl, name, G,device):
     with torch.no_grad():
         fig, axes = plt.subplots(6, 8, figsize=(12, 12))
         ax = axes.ravel()
@@ -390,4 +390,4 @@ if __name__ == "__main__":
     trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, device)
 
     train_show_img(5, trained_G)
-    evaluate(val_dl, 5, trained_G)
+    evaluate(val_dl, 5, trained_G,device)
