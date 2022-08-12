@@ -39,6 +39,13 @@ class Transform():
         return self.data_transform(img)
 
 
+def _separate(img) -> Tuple[Image.Image, Image.Image]:
+    img = np.array(img, dtype=np.uint8)
+    h, w, _ = img.shape
+    w = int(w / 2)
+    return Image.fromarray(img[:, :w, :]), Image.fromarray(img[:, w:, :])
+
+
 class Dataset(object):
     def __init__(self, files: List[str]):
         self.files = files
