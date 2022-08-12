@@ -397,4 +397,4 @@ if __name__ == "__main__":
     trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, device)
 
     train_show_img(5, trained_G)
-    evaluate(val_dl, 5, trained_G,device)
+    #evaluate(val_dl, 5, trained_G,device)

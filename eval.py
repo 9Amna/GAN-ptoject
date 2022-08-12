@@ -137,7 +137,7 @@ if __name__ == "__main__":
     val = read_path(data_path=root_path, split="val")
     train_ds = Dataset(train)
     val_ds = Dataset(val)
-  
+
     BATCH_SIZE = args.BATCH_SIZE
     device = args.device
     torch.manual_seed(0)
