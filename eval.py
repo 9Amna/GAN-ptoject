@@ -68,12 +68,18 @@ def de_norm(img):
     img_ = np.transpose(img_, (1, 2, 0))
     return img_
 
+def load_model(name):
+    G = Generator()
+    G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{name}.pth", map_location={"cuda:0": "cpu"}))
+    G.eval()
+    return G.to(device)
 
-def evaluate(val_dl, name, G, device):
+
+def evaluate(val_dl, name, device):
     with torch.no_grad():
         fig, axes = plt.subplots(6, 8, figsize=(12, 12))
         ax = axes.ravel()
-        #         G = load_model(name)
+        G = load_model(name)
         for input_img, real_img in tqdm(val_dl):
             input_img = input_img.to(device)
             real_img = real_img.to(device)
