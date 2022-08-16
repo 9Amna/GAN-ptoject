@@ -108,9 +108,9 @@ class Generator(nn.Module):
 
 
 
-def load_model(name):
+def load_model(model_path):
     G = Generator()
-    G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{name}.pth", map_location={"cuda:0": "cpu"}))
+    G.load_state_dict(torch.load(model_path, map_location={"cuda:0": "cpu"}))
     G.eval()
     return G.to(device)
 
