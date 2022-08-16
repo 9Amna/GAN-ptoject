@@ -393,8 +393,8 @@ if __name__ == "__main__":
         G = Generator()
         D = Discriminator()
 
-    EPOCH = 25
-    trained_G, trained_D = train_loop(train_dl, G, D, EPOCH, device)
+
+    trained_G, trained_D = train_loop(train_dl, G, D, args.EPOCH, device)
 
     train_show_img(5, trained_G)
     #evaluate(val_dl, 5, trained_G,device)
