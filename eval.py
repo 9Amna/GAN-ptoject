@@ -67,6 +67,46 @@ def de_norm(img):
     img_ = img_.add(torch.FloatTensor(MEAN).view(3, 1, 1)).detach().numpy()
     img_ = np.transpose(img_, (1, 2, 0))
     return img_
+class Generator(nn.Module):
+    def __init__(self) -> object:
+        super(Generator, self).__init__()
+        self.enc1 = self.conv2Relu(3, 32, 5)  # encoder
+        self.enc2 = self.conv2Relu(32, 64, pool_size=4)
+        self.enc3 = self.conv2Relu(64, 128, pool_size=2)
+        self.enc4 = self.conv2Relu(128, 256, pool_size=2)
+
+        self.dec1 = self.deconv2Relu(256, 128, pool_size=2)  # decoder
+        self.dec2 = self.deconv2Relu(128 + 128, 64, pool_size=2)
+        self.dec3 = self.deconv2Relu(64 + 64, 32, pool_size=4)
+        self.dec4 = nn.Sequential(
+            nn.Conv2d(32 + 32, 3, 5, padding=2),
+            nn.Tanh()
+        )
+
+    def conv2Relu(self, in_c, out_c, kernel_size=3, pool_size=None):
+        layer = []
+        if pool_size:
+            # Down width and height
+            layer.append(nn.AvgPool2d(pool_size))
+        # Up channel size
+        layer.append(nn.Conv2d(in_c, out_c, kernel_size, padding=(kernel_size - 1) // 2))
+        layer.append(nn.LeakyReLU(0.2, inplace=True))
+        layer.append(nn.BatchNorm2d(out_c))
+        layer.append(nn.ReLU(inplace=True))
+        return nn.Sequential(*layer)
+
+    def deconv2Relu(self, in_c, out_c, kernel_size=3, stride=1, pool_size=None):
+        layer = []
+        if pool_size:
+            # Up width and height
+            layer.append(nn.UpsamplingNearest2d(scale_factor=pool_size))
+        # Down channel size
+        layer.append(nn.Conv2d(in_c, out_c, kernel_size, stride, padding=1))
+        layer.append(nn.BatchNorm2d(out_c))
+        layer.append(nn.ReLU(inplace=True))
+        return nn.Sequential(*layer)
+
+
 
 def load_model(name):
     G = Generator()
@@ -75,7 +115,7 @@ def load_model(name):
     return G.to(device)
 
 
-def evaluate(val_dl, name, device):
+def evaluate(val_dl, name, G, device):
     with torch.no_grad():
         fig, axes = plt.subplots(6, 8, figsize=(12, 12))
         ax = axes.ravel()
@@ -152,4 +192,5 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    evaluate(val_dl, 5, trained_G, device)
+    G = load_model("/content/drive/MyDrive/saving_G30.pth")
+    evaluate(val_dl, 5, G, device)
