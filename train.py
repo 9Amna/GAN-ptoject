@@ -14,6 +14,33 @@ from torchvision import transforms
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 
+def load_args(default_config=None):
+    parser = argparse.ArgumentParser(description='GAN model implementation')
+    # -- access to dataset
+    parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
+    # -- parameters
+    parser.add_argument('--MEAN', default=(0.5, 0.5, 0.5,), help='mean')
+    parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
+    parser.add_argument('--RESIZE', type=int, default=256, help='resize')
+    parser.add_argument('--LAMBDA', type=int, default=100.0, help='lambda value')
+    # -- train
+    parser.add_argument('--BATCH_SIZE', type=int, default=8, help='Mini-batch size')
+    parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
+    parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
+    parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
+    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
+    parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
+    parser.add_argument('--device', type=str, default='cuda', choices=['cuda', 'cpu'])
+    # -- conv / deconv layers
+    parser.add_argument('--kernel_size', default=3, help='size of kernel')
+    parser.add_argument('--pool_size', default=None, help='size of pool')
+    parser.add_argument('--stride', type=int, default=1)
+    parser.add_argument('--resume', default='/content/drive/MyDrive/saving_D30.pth',
+                        help='checkpoint to resume training from (default: None)')
+
+    args = parser.parse_args()
+    return args
+
 
 def read_path(data_path, split) -> List[str]:
     path = os.path.join(data_path, split)
@@ -24,7 +51,7 @@ def read_path(data_path, split) -> List[str]:
 
 
 class Transform():
-    def __init__(self, resize=RESIZE, mean=MEAN, std=STD):
+    def __init__(self, resize=args.RESIZE, mean=args.MEAN, std=args.STD):
         self.data_transform = transforms.Compose([
             transforms.Resize((resize, resize)),
             transforms.ToTensor(),
@@ -327,32 +354,7 @@ def evaluate(val_dl, name, G,device):
 
 
 
-def load_args(default_config=None):
-    parser = argparse.ArgumentParser(description='GAN model implementation')
-    # -- access to dataset
-    parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
-    # -- parameters
-    parser.add_argument('--MEAN', default=(0.5, 0.5, 0.5,), help='mean')
-    parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
-    parser.add_argument('--RESIZE', type=int, default=256, help='resize')
-    parser.add_argument('--LAMBDA', type=int, default=100.0, help='lambda value')
-    # -- train
-    parser.add_argument('--BATCH_SIZE', type=int, default=8, help='Mini-batch size')
-    parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
-    parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
-    parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
-    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
-    parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
-    parser.add_argument('--device', type=str, default='cuda', choices=['cuda', 'cpu'])
-    # -- conv / deconv layers
-    parser.add_argument('--kernel_size', default=3, help='size of kernel')
-    parser.add_argument('--pool_size', default=None, help='size of pool')
-    parser.add_argument('--stride', type=int, default=1)
-    parser.add_argument('--resume', default='/content/drive/MyDrive/saving_D30.pth',
-                        help='checkpoint to resume training from (default: None)')
 
-    args = parser.parse_args()
-    return args
 
 
 if __name__ == "__main__":
