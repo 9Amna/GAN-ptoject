@@ -219,5 +219,5 @@ if __name__ == "__main__":
     G = load_model("/content/drive/MyDrive/saving_G26.pth")
     input_img = input_tensor[None].to(device)
     generated_img = G(input_img)
-
+    plt.show("generated.png", de_norm(generated_img[0]))
     evaluate(val_dl, 5, G, device)
