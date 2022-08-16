@@ -52,10 +52,11 @@ class Dataset(object):
         self.trasformer = Transform()
 
     def _separate(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        img = np.array(img, dtype=np.uint8)
-        h, w, _ = img.shape
-        w = int(w / 2)
-        return Image.fromarray(img[:, :w, :]), Image.fromarray(img[:, w:, :])
+        img = Image.open(self.files[idx])
+        input, output = _separate(img)
+        input_tensor = self.trasformer(input)
+        output_tensor = self.trasformer(output)
+        return input_tensor, output_tensor
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         img = Image.open(self.files[idx])
@@ -73,6 +74,8 @@ def de_norm(img):
     img_ = img_.add(torch.FloatTensor(MEAN).view(3, 1, 1)).detach().numpy()
     img_ = np.transpose(img_, (1, 2, 0))
     return img_
+
+
 class Generator(nn.Module):
     def __init__(self) -> object:
         super(Generator, self).__init__()
@@ -127,7 +130,7 @@ class Generator(nn.Module):
 
 def load_model(model_path):
     G = Generator()
-    G.load_state_dict(torch.load(model_path, map_location={"cuda:0": "cpu"}))
+    G.load_state_dict(torch.load(model_path, map_location="cuda"))
     G.eval()
     return G.to(device)
 
@@ -220,4 +223,4 @@ if __name__ == "__main__":
     input_img = input_tensor[None].to(device)
     generated_img = G(input_img)
 
-    evaluate(val_dl, 5, G, device)
+    # evaluate(val_dl, 5, G, device)
