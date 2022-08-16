@@ -46,26 +46,6 @@ def _separate(img) -> Tuple[Image.Image, Image.Image]:
     return Image.fromarray(img[:, :w, :]), Image.fromarray(img[:, w:, :])
 
 
-class Dataset(object):
-    def __init__(self, files: List[str]):
-        self.files = files
-        self.trasformer = Transform()
-
-    def _separate(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        img = np.array(img, dtype=np.uint8)
-        h, w, _ = img.shape
-        w = int(w / 2)
-        return Image.fromarray(img[:, :w, :]), Image.fromarray(img[:, w:, :])
-
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        img = Image.open(self.files[idx])
-        input, output = self._separate(img)
-        input_tensor = self.trasformer(input)
-        output_tensor = self.trasformer(output)
-        return input_tensor, output_tensor
-
-    def __len__(self):
-        return len(self.files)
 
 
 def de_norm(img):
@@ -127,7 +107,7 @@ class Generator(nn.Module):
 
 def load_model(model_path):
     G = Generator()
-    G.load_state_dict(torch.load(model_path, map_location={"cuda:0": "cpu"}))
+    G.load_state_dict(torch.load(model_path, map_location="cuda"))
     G.eval()
     return G.to(device)
 
@@ -197,10 +177,8 @@ if __name__ == "__main__":
     # root_path = "/content/drive/MyDrive/Dataset_dents"
     train = read_path(data_path=root_path, split="train")
     val = read_path(data_path=root_path, split="val")
-    train_ds = Dataset(train)
-    val_ds = Dataset(val)
     trasformer = Transform()
-    image_path = "idJob_zyswwv##imgSmile.jpg"
+    image_path = "/home/ahmed/workspace/data/pix2pix_teeth_dataset/idJob_0w4ics##imgSmile.jpg"
     img = Image.open(image_path)
     img = np.array(img, dtype=np.uint8)
     h, w, _ = img.shape
@@ -212,12 +190,17 @@ if __name__ == "__main__":
     device = args.device
     torch.manual_seed(0)
     np.random.seed(0)
+    #
+    # train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
+    # val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-    val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
-
-    G = load_model("/content/drive/MyDrive/saving_G26.pth")
+    G = load_model("saving_G60.pth")
     input_img = input_tensor[None].to(device)
     generated_img = G(input_img)
 
-    evaluate(val_dl, 5, G, device)
+    save_image(generated_img.detach().cpu(), "generated.png", range=(-1.0, 1.0), normalize=True)
+
+    img = de_norm(generated_img[0].cpu())
+    cv2.imshow("", (img * 255).astype(np.uint8)[:, :, ::-1])
+    cv2.waitKey(0)
+    # evaluate(val_dl, 5, G, device)
