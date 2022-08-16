@@ -199,5 +199,5 @@ if __name__ == "__main__":
     train_dl = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, drop_last=False)
 
-    G = load_model("/content/drive/MyDrive/saving_G30.pth")
+    G = load_model("/content/drive/MyDrive/saving_G26.pth")
     evaluate(val_dl, 5, G, device)
