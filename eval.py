@@ -58,6 +58,13 @@ class Dataset(object):
         output_tensor = self.trasformer(output)
         return input_tensor, output_tensor
 
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        img = Image.open(self.files[idx])
+        input, output = self._separate(img)
+        input_tensor = self.trasformer(input)
+        output_tensor = self.trasformer(output)
+        return input_tensor, output_tensor
+
     def __len__(self):
         return len(self.files)
 
