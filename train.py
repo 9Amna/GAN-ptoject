@@ -14,6 +14,12 @@ from torchvision import transforms
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 
+
+MEAN = (0.5, 0.5, 0.5,)
+STD = (0.5, 0.5, 0.5,)
+RESIZE = 256
+
+
 def load_args(default_config=None):
     parser = argparse.ArgumentParser(description='GAN model implementation')
     # -- access to dataset
@@ -51,7 +57,7 @@ def read_path(data_path, split) -> List[str]:
 
 
 class Transform():
-    def __init__(self, resize=args.RESIZE, mean=args.MEAN, std=args.STD):
+    def __init__(self, resize=RESIZE, mean=MEAN, std=STD):
         self.data_transform = transforms.Compose([
             transforms.Resize((resize, resize)),
             transforms.ToTensor(),
