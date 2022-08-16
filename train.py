@@ -14,10 +14,6 @@ from torchvision import transforms
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 
-MEAN = (0.5, 0.5, 0.5,)
-STD = (0.5, 0.5, 0.5,)
-RESIZE = 256
-
 
 def read_path(data_path, split) -> List[str]:
     path = os.path.join(data_path, split)
