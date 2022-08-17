@@ -15,9 +15,7 @@ from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 
 
-MEAN = (0.5, 0.5, 0.5,)
-STD = (0.5, 0.5, 0.5,)
-RESIZE = 256
+
 
 
 def load_args(default_config=None):
@@ -47,6 +45,9 @@ def load_args(default_config=None):
     args = parser.parse_args()
     return args
 
+MEAN = args.MEAN
+STD = args.STD
+RESIZE = args.RESIZE
 
 def read_path(data_path, split) -> List[str]:
     path = os.path.join(data_path, split)
