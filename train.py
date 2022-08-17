@@ -45,9 +45,7 @@ def load_args(default_config=None):
     args = parser.parse_args()
     return args
 
-MEAN = args.MEAN
-STD = args.STD
-RESIZE = args.RESIZE
+
 
 def read_path(data_path, split) -> List[str]:
     path = os.path.join(data_path, split)
@@ -367,6 +365,9 @@ def evaluate(val_dl, name, G,device):
 if __name__ == "__main__":
     args = load_args()
     print(args)
+    MEAN = args.MEAN
+    STD = args.STD
+    RESIZE = args.RESIZE
     root_path = args.root_path
     # root_path = "/content/drive/MyDrive/Dataset_dents"
     train = read_path(data_path=root_path, split="train")
