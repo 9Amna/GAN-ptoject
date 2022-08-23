@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 
 MEAN = (0.5, 0.5, 0.5,)
 STD = (0.5, 0.5, 0.5,)
-RESIZE = 512
+RESIZE = 256
 
 
 
@@ -205,8 +205,8 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
         input_img = input_img.to(device)
         real_img = real_img.to(device)
 
-        real_label = torch.ones(input_img.size()[0], 1, 16, 16).to(device)
-        fake_label = torch.zeros(input_img.size()[0], 1, 16, 16).to(device)
+        real_label = torch.ones(input_img.size()[0], 1, 8, 8).to(device)
+        fake_label = torch.zeros(input_img.size()[0], 1, 8, 8).to(device)
         # Generator
         fake_img = G(input_img)
         fake_img_ = fake_img.detach()  # commonly using
