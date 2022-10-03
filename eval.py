@@ -18,6 +18,33 @@ MEAN = (0.5, 0.5, 0.5,)
 STD = (0.5, 0.5, 0.5,)
 RESIZE = 256
 
+def load_args(default_config=None):
+    parser = argparse.ArgumentParser(description='GAN model implementation')
+    # -- access to dataset
+    parser.add_argument('--root_path', default='/content/drive/MyDrive/Data_pix2pix_complet', help='path to dataset')
+    # -- parameters
+    parser.add_argument('--MEAN', default=(0.5, 0.5, 0.5,), help='mean')
+    parser.add_argument('--STD', default=(0.5, 0.5, 0.5,), help='std')
+    parser.add_argument('--RESIZE', type=int, default=256, help='resize')
+    parser.add_argument('--LAMBDA', type=int, default=100.0, help='lambda value')
+    # -- train
+    parser.add_argument('--BATCH_SIZE', type=int, default=8, help='Mini-batch size')
+    parser.add_argument('--optimizer_g', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
+    parser.add_argument('--optimizer_d', type=str, default='ADAM', choices=['adam', 'sgd',  'RMSprop'])
+    parser.add_argument('--lr', default=0.0002, type=float, help='initial learning rate')
+    parser.add_argument('--betas', default=(0.5, 0.999), help='initial betas value')
+    parser.add_argument('--EPOCH', default=30, type=int, help='number of epochs')
+    parser.add_argument('--device', type=str, default='cuda', choices=['cuda', 'cpu'])
+    # -- conv / deconv layers
+    parser.add_argument('--kernel_size', default=3, help='size of kernel')
+    parser.add_argument('--pool_size', default=None, help='size of pool')
+    parser.add_argument('--stride', type=int, default=1)
+    parser.add_argument('--resume', default='/content/drive/MyDrive/saving_D30.pth',
+                        help='checkpoint to resume training from (default: None)')
+
+    args = parser.parse_args()
+    return args
+
 
 def read_path(data_path, split) -> List[str]:
     path = os.path.join(data_path, split)
@@ -111,6 +138,75 @@ def load_model(model_path):
     G.eval()
     return G.to(device)
 
+def train_fn(val_dl, criterion_bce, criterion_mae, optimizer_g, optimizer_d, device):
+    LAMBDA = 100.0
+    total_loss_g = [], []
+    for i, (input_img, real_img) in enumerate(tqdm(val_dl)):
+        input_img = input_img.to(device)
+        real_img = real_img.to(device)
+
+        real_label = torch.ones(input_img.size()[0], 1, 8, 8).to(device)
+        fake_label = torch.zeros(input_img.size()[0], 1, 8, 8).to(device)
+        # Generator
+        fake_img = G(input_img)
+        fake_img_ = fake_img.detach()  # commonly using
+        loss_g_mae = criterion_mae(fake_img, real_img)  # MSELoss
+
+        optimizer_g.zero_grad()
+        optimizer_d.zero_grad()
+        loss_g.backward(retain_graph=True)
+        optimizer_g.step()
+
+    return mean(total_loss_g), fake_img.detach().cpu()
+
+
+def saving_img(fake_img, e):
+    os.makedirs("generated", exist_ok=True)
+    save_image(fake_img, f"generated/fake{str(e)}.png", range=(-1.0, 1.0), normalize=True)
+
+
+def saving_logs(result):
+    with open("train.pkl", "wb") as f:
+        pickle.dump([result], f)
+
+
+def saving_model(G, e):
+    os.makedirs("weight", exist_ok=True)
+    torch.save(G.state_dict(), f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
+    #torch.save(D.state_dict(), f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
+
+
+def show_losses(g):
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    ax = axes.ravel()
+    ax[0].plot(np.arange(len(g)).tolist(), g)
+    ax[0].set_title("Generator Loss")
+    plt.show()
+
+
+def train_loop(val_dl,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
+    criterion_mae = nn.L1Loss()
+    criterion_bce = nn.BCEWithLogitsLoss()
+
+    total_loss_g = [], []
+    result = {}
+
+    for e in range(num_epoch):
+        # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
+        # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
+        loss_g, loss_d, fake_img = train_fn(val_dl, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
+        total_loss_g.append(loss_g)
+        saving_img(fake_img, e + 1)
+
+    try:
+        result["G"] = total_loss_g
+        result["D"] = total_loss_d
+        saving_logs(result)
+        show_losses(total_loss_g)
+        saving_model(G, e)
+        print("successfully save model")
+    finally:
+        return G
 
 def evaluate(val_dl, name, G, device):
     with torch.no_grad():
