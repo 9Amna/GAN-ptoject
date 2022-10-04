@@ -201,6 +201,7 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
     D.train()
     LAMBDA = 100.0
     total_loss_g, total_loss_d = [], []
+    total_loss_g1, total_loss_d1 = [], []
     for i, (input_img, real_img) in enumerate(tqdm(train_dl)):
         input_img = input_img.to(device)
         real_img = real_img.to(device)
@@ -232,7 +233,38 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
         optimizer_d.zero_grad()
         loss_d.backward()
         optimizer_d.step()
-    return mean(total_loss_g), mean(total_loss_d), fake_img.detach().cpu()
+    for i, (input_img, real_img) in enumerate(tqdm(val_dl)):
+        input_img = input_img.to(device)
+        real_img = real_img.to(device)
+
+        real_label = torch.ones(input_img.size()[0], 1, 8, 8).to(device)
+        fake_label = torch.zeros(input_img.size()[0], 1, 8, 8).to(device)
+        # Generator
+        fake_img = G(input_img)
+        fake_img_ = fake_img.detach()  # commonly using
+        out_fake = D(fake_img, input_img)
+        loss_g_bce1 = criterion_bce(out_fake, real_label)  # binaryCrossEntropy
+        loss_g_mae1 = criterion_mae(fake_img, real_img)  # MSELoss
+        loss_g1 = loss_g_bce1 + LAMBDA * loss_g_mae1
+        total_loss_g1.append(loss_g1.item())
+
+        optimizer_g.zero_grad()
+        optimizer_d.zero_grad()
+        loss_g1.backward(retain_graph=True)
+        optimizer_g.step()
+        # Discriminator
+        out_real = D(real_img, input_img)
+        loss_d_real1 = criterion_bce(out_real, real_label)
+        out_fake = D(fake_img_, input_img)
+        loss_d_fake1 = criterion_bce(out_fake, fake_label)
+        loss_d1 = loss_d_real1 + loss_d_fake1
+        total_loss_d1.append(loss_d1.item())
+
+        optimizer_g.zero_grad()
+        optimizer_d.zero_grad()
+        loss_d1.backward()
+        optimizer_d.step()
+    return mean(total_loss_g), mean(total_loss_d),mean(total_loss_g1), mean(total_loss_d1), fake_img.detach().cpu()
 
 
 def saving_img(fake_img, e):
@@ -270,14 +302,18 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     criterion_bce = nn.BCEWithLogitsLoss()
 
     total_loss_d, total_loss_g = [], []
+    total_loss_d1, total_loss_g1 = [], []
     result = {}
 
     for e in range(num_epoch):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
         # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
         loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
+        loss_g1, loss_d1, fake_img1 = train_fn(val_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
         total_loss_d.append(loss_d)
         total_loss_g.append(loss_g)
+        total_loss_d1.append(loss_d1)
+        total_loss_g1.append(loss_g1)
         saving_img(fake_img, e + 1)
         torch.save({
             'epoch': e,
@@ -294,8 +330,10 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     try:
         result["G"] = total_loss_d
         result["D"] = total_loss_g
+        result["G_t"] = total_loss_d1
+        result["D_t"] = total_loss_g1
         saving_logs(result)
-        show_losses(total_loss_g, total_loss_d)
+        show_losses(total_loss_g, total_loss_d,total_loss_g1, total_loss_d1)
         saving_model(D, G, e)
         print("successfully save model")
     finally:
