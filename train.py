@@ -201,7 +201,6 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
     D.train()
     LAMBDA = 100.0
     total_loss_g, total_loss_d = [], []
-    total_loss_g1, total_loss_d1 = [], []
     for i, (input_img, real_img) in enumerate(tqdm(train_dl)):
         input_img = input_img.to(device)
         real_img = real_img.to(device)
@@ -233,6 +232,12 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
         optimizer_d.zero_grad()
         loss_d.backward()
         optimizer_d.step()
+    return mean(total_loss_g), mean(total_loss_d), fake_img.detach().cpu()
+def test_fn(val_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d, device):
+    G.train()
+    D.train()
+    LAMBDA = 100.0
+    total_loss_g1, total_loss_d1 = [], []
     for i, (input_img, real_img) in enumerate(tqdm(val_dl)):
         input_img = input_img.to(device)
         real_img = real_img.to(device)
@@ -240,11 +245,11 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
         real_label = torch.ones(input_img.size()[0], 1, 8, 8).to(device)
         fake_label = torch.zeros(input_img.size()[0], 1, 8, 8).to(device)
         # Generator
-        fake_img = G(input_img)
-        fake_img_ = fake_img.detach()  # commonly using
-        out_fake = D(fake_img, input_img)
+        fake_img1 = G(input_img)
+        fake_img_ = fake_img1.detach()  # commonly using
+        out_fake = D(fake_img1, input_img)
         loss_g_bce1 = criterion_bce(out_fake, real_label)  # binaryCrossEntropy
-        loss_g_mae1 = criterion_mae(fake_img, real_img)  # MSELoss
+        loss_g_mae1 = criterion_mae(fake_img1, real_img)  # MSELoss
         loss_g1 = loss_g_bce1 + LAMBDA * loss_g_mae1
         total_loss_g1.append(loss_g1.item())
 
@@ -264,8 +269,7 @@ def train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimize
         optimizer_d.zero_grad()
         loss_d1.backward()
         optimizer_d.step()
-    return mean(total_loss_g), mean(total_loss_d),mean(total_loss_g1), mean(total_loss_d1), fake_img.detach().cpu()
-
+    return mean(total_loss_g1), mean(total_loss_d1), fake_img1.detach().cpu()
 
 def saving_img(fake_img, e):
     os.makedirs("generated", exist_ok=True)
@@ -339,7 +343,46 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     finally:
         return G, D
 
+def test_loop(val_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
+    G.to(device)
+    D.to(device)
+    optimizer_g = torch.optim.Adam(G.parameters(), lr=lr, betas=betas)
+    optimizer_d = torch.optim.Adam(D.parameters(), lr=lr, betas=betas)
+    criterion_mae = nn.L1Loss()
+    criterion_bce = nn.BCEWithLogitsLoss()
 
+    total_loss_d1, total_loss_g1 = [], []
+    result = {}
+
+    for e in range(num_epoch):
+        # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
+        # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
+
+        loss_g1, loss_d1, fake_img1 = test_fn(val_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
+        total_loss_d1.append(loss_d1)
+        total_loss_g1.append(loss_g1)
+        saving_img(fake_img1, e + 1)
+        torch.save({
+            'epoch': e,
+            'model_state_dict': G.state_dict(),
+            'optimizer_state_dict': optimizer_g.state_dict(),
+            'loss': loss_g1, }, f"/content/drive/MyDrive/saving_G{str(e + 1)}.pth")
+        torch.save({
+            'epoch': e,
+            'model_state_dict': D.state_dict(),
+            'optimizer_state_dict': optimizer_d.state_dict(),
+            'loss': loss_d1, }, f"/content/drive/MyDrive/saving_D{str(e + 1)}.pth")
+    if e % 1 == 0:
+            saving_model(D, G, e)
+    try:
+        result["G_t"] = total_loss_d1
+        result["D_t"] = total_loss_g1
+        saving_logs(result)
+        show_losses(total_loss_g1, total_loss_d1)
+        saving_model(D, G, e)
+        print("successfully save model test")
+    finally:
+        return G, D
 def load_model(name):
     G = Generator()
     G.load_state_dict(torch.load(f"/content/drive/MyDrive/saving_G{name}.pth", map_location={"cuda:0": "cpu"}))
@@ -441,6 +484,7 @@ if __name__ == "__main__":
 
 
     trained_G, trained_D = train_loop(train_dl, G, D, args.EPOCH, device)
+    trained_G1, trained_D1 = test_loop(val_dl, G, D, args.EPOCH, device)
 
     train_show_img(5, trained_G)
     #evaluate(val_dl, 5, trained_G,device)
