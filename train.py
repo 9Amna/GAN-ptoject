@@ -306,18 +306,15 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     criterion_bce = nn.BCEWithLogitsLoss()
 
     total_loss_d, total_loss_g = [], []
-    total_loss_d1, total_loss_g1 = [], []
+
     result = {}
 
     for e in range(num_epoch):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
         # wandb.log({"epoch": num_epoch, "loss_d": loss_d})
         loss_g, loss_d, fake_img = train_fn(train_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
-        loss_g1, loss_d1, fake_img1 = train_fn(val_dl, G, D, criterion_bce, criterion_mae, optimizer_g, optimizer_d,device)
         total_loss_d.append(loss_d)
         total_loss_g.append(loss_g)
-        total_loss_d1.append(loss_d1)
-        total_loss_g1.append(loss_g1)
         saving_img(fake_img, e + 1)
         torch.save({
             'epoch': e,
@@ -334,10 +331,9 @@ def train_loop(train_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     try:
         result["G"] = total_loss_d
         result["D"] = total_loss_g
-        result["G_t"] = total_loss_d1
-        result["D_t"] = total_loss_g1
         saving_logs(result)
-        show_losses(total_loss_g, total_loss_d,total_loss_g1, total_loss_d1)
+        show_losses(total_loss_g, total_loss_d)
+        saving_img(result.detach().cpu(), "train_model.png", range=(-1.0, 1.0), normalize=True)
         saving_model(D, G, e)
         print("successfully save model")
     finally:
@@ -352,7 +348,7 @@ def test_loop(val_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     criterion_bce = nn.BCEWithLogitsLoss()
 
     total_loss_d1, total_loss_g1 = [], []
-    result = {}
+    result1 = {}
 
     for e in range(num_epoch):
         # wandb.log({"epoch": num_epoch, "loss_g": loss_g})
@@ -375,11 +371,12 @@ def test_loop(val_dl, G, D,num_epoch, device, lr=0.0002, betas=(0.5, 0.999)):
     if e % 1 == 0:
             saving_model(D, G, e)
     try:
-        result["G_t"] = total_loss_d1
-        result["D_t"] = total_loss_g1
-        saving_logs(result)
+        result1["G_t"] = total_loss_d1
+        result1["D_t"] = total_loss_g1
+        saving_logs(result1)
         show_losses(total_loss_g1, total_loss_d1)
         saving_model(D, G, e)
+        saving_img(result1.detach().cpu(), "test_model.png", range=(-1.0, 1.0), normalize=True)
         print("successfully save model test")
     finally:
         return G, D
